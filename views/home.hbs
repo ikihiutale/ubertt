@@ -1,0 +1,22 @@
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">Upload an XML</h3>
+  </div>
+  <form id="xml-upload-form" method="post" action="/validators" enctype="multipart/form-data">
+    <div class="panel-body form-horizontal">
+      <div class="form-group col-md-12">
+        <label class="col-sm-2 control-label" for="xmlfile">Browse:</label> 
+        <div class="col-md-10">
+          <input class="form-control" type="file" name="xmlfile" id="xmlfile" />
+        </div>
+      </div>            
+      <div class="form-group col-md-12">
+        <div class="col-md-12 text-right"> 
+          <button type="submit" id="login-btn" class="btn btn-success">                      
+            <i class="fa fa-cloud-upload"></i>Upload XML
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div> 
