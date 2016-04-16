@@ -36,6 +36,16 @@ git add .
 git commit -am "New Procfile"
 git push heroku master
 
+Add the Mongolab addon:
+heroku addons:create mongolab:sandbox
+
+Check confgiguration:
+MONGODB_URI: mongodb://..
+
+heroku config
+
+
+
 ### GIT
 
 echo "# ubertt" >> README.md
