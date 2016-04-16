@@ -40,9 +40,11 @@ Add the Mongolab addon:
 heroku addons:create mongolab:sandbox
 
 Check confgiguration:
+$ heroku config
 MONGODB_URI: mongodb://..
 
-heroku config
+Open the app:
+$ heroku open
 
 
 
