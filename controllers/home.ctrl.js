@@ -4,8 +4,10 @@
 'use strict';
 
 function ctrl(req, res) {
-  var viewModel = {};
-  res.render('home', viewModel);
+  var viewModel = {
+      title: "UberTT"
+  };
+  res.render('login', viewModel);
 } 
 
 module.exports = ctrl;

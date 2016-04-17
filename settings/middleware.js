@@ -9,6 +9,7 @@ var cors = require('cors'),
     morgan = require('morgan'),
     helmet = require('helmet'),
     express = require('express'),
+    
     // Templating engine 
     exphbs = require('express-handlebars'),
     // Helps parsing any form fields that are submitted 
@@ -39,41 +40,50 @@ var cors = require('cors'),
 
 
 /**
- * Set routes and error handling
- * @method setRoutes
- * @param {Object} app The express application
+ * Wire up our routes via the app object.
+ * Router is used and it responds to requests such as 
+ * GET, POST, PUT, and UPDATE.
+ * Route error handling and static resource directory are 
+ * also set here,
+ * @method setRoutesAndStatic
+ * @param {object} app The express application
  * @private
  */
-function setRoutes(app) {
-  routes.setRoutes(app);
+function setRoutesAndStatic(app) {
   
+  routes.setRoutes(app);
   // Predefined static resource directory for css, js etc.
   // NOTE: it's important that your static middleware is 
   // defined after the route settings (routes.setRoutes) so that 
   // static assets aren't inadvertently taking priority over a 
   // matching route that may have been defined.
   app.use('/public', express.static(path.join(__dirname, '../public')));
-
   routes.setErrRoutes(app);
 }
 
 /**
- * Set view engine
+ * Set Handlerbars as the template engine with 
+ * main.hbs as the default main layout.
  * @method setViewEngine
  * @param {Object} app The express application
  * @private
  */
 function setViewEngine(app) {
+  var hbs = exphbs.create({    
+    defaultLayout: 'main',    
+    layoutsDir: path.join(app.get('views'), '/layouts'),    
+    partialsDir: [path.join(app.get('views'), '/partials')],
+    extname: '.hbs',
+    helpers: {
+      foo: function () { return 'FOO!'; },
+      bar: function () { return 'BAR!'; }
+    }});
+  app.set('views', path.join(__dirname, '../views')); 
   // The used file extension for Handlebars is .hbs. It could be
   // anything as long as the first parameter to the app.engine() 
   // function and the second parameter in the app.set('view engine') 
   // function are identical. 
-  app.set('views', path.join(__dirname, '../views')); 
-  app.engine('.hbs', exphbs.create({    
-    defaultLayout: 'main',    
-    layoutsDir: path.join(app.get('views'), '/layouts'),    
-    partialsDir: [path.join(app.get('views'), '/partials')],
-    extname: '.hbs' }).engine);
+  app.engine('.hbs', hbs.engine);
   app.set('view engine', '.hbs'); 
 }
 
@@ -89,22 +99,18 @@ function setMiddleware(app) {
     app.use(morgan('dev', { "stream": logger.stream }));
     // app.use(morgan('dev'));
     // Disable views cache
-    app.set('view cache', false);
+    app.disable('view cache');
   } 
-  // Request body parsing middleware should be above methodOverride
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
-  app.use(methodOverride());
   app.use(cookieParser(config.token.secret));
-  // Wire up our routes via the app object.
-  // Router is used and it responds to requests such as 
-  // GET, POST, PUT, and UPDATE
-  setRoutes(app);
-
- 
-  // uncomment after placing your favicon in /public
-  //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+  // Request body parsing middleware should be above methodOverride
+  app.use(methodOverride());
+  // TODO uncomment after placing your favicon in /public
+  // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
   setViewEngine(app);
+  
+  setRoutesAndStatic(app);
   if (config.environment === 'development') {   
     app.use(errorHandler()); 
   }

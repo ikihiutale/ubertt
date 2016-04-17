@@ -14,6 +14,9 @@ Timetable
 
 ## Developing
 
+### Authetication
+Passport, jsonwebtoken and local passport strategy are used for authentication  
+
 
 
 ## Tools
@@ -25,19 +28,19 @@ https://dashboard.heroku.com/apps/ubertt
 Go to local project folder that is already under version control (git)
 Create remote:
 heroku git:remote -a ubertt
-git remote -v
+$ git remote -v
 
 
 create Procfile and add:
 "web: node index.js"
 
 Save changes:
-git add .
-git commit -am "New Procfile"
-git push heroku master
+$ git add .
+$ git commit -am "New Procfile"
+$ git push heroku master
 
 Add the Mongolab addon:
-heroku addons:create mongolab:sandbox
+$ heroku addons:create mongolab:sandbox
 
 Check confgiguration:
 $ heroku config

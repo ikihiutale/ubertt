@@ -1,5 +1,5 @@
 'use strict';
 
 module.exports = {
-  'home': require('./home'),
+  'home': require('./home.ctrl'),
 };
