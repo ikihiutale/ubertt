@@ -1,0 +1,43 @@
+<div class="row">
+<div class="col-sm-6 col-sm-offset-3">
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title pull-left">Registration</h3>
+    <button class="btn btn-default pull-right">&times;</button>
+    <div class="clearfix"></div>
+  </div>
+  <div class="panel-body">
+  <form id="uber_registration" role="form" action="/registration">
+    {{!-- <legend></legend> --}}
+    <fieldset class="form-group">
+      <label for="uber_forename">Forename:</label>
+      <input type="text" class="form-control" id="uber_forenamer">
+    </fieldset>
+      <label for="uber_surname">Surname:</label>
+      <input type="text" class="form-control" id="uber_surnamer">
+    </fieldset>
+    <fieldset class="form-group">
+      <label for="uber_email">Email:</label>
+      <input type="email" class="form-control" id="uber_email">
+    </fieldset>    
+    <fieldset class="form-group">
+      <label for="uber_pwd1">Password:</label>
+      <input type="password" class="form-control" id="uber_pwd1">
+    </fieldset>
+    <fieldset class="form-group">
+      <label for="uber_pwd2">Confirm Password:</label>
+      <input type="password" class="form-control" id="uber_pwd2">
+    </fieldset>
+    <div class="checkbox">
+      <label><input type="checkbox" id="uber_remember">Remember me</label>
+    </div>
+    <fieldset class="form-group">
+      <div class="col-sm-12 text-center"> 
+        <button type="submit" class="btn btn-primary btn-lg" id="uber_submit-registration">Submit</button>
+      </div>
+    </fieldset>
+  </form>
+  </div>
+</div>
+</div>
+</div>

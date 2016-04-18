@@ -6,10 +6,9 @@
 var cors = require('cors'),
     path = require('path'),
     // Automated logging of request/response
-    morgan = require('morgan'),
+    morgan = require('morgan'), 
     helmet = require('helmet'),
     express = require('express'),
-    
     // Templating engine 
     exphbs = require('express-handlebars'),
     // Helps parsing any form fields that are submitted 
@@ -50,14 +49,9 @@ var cors = require('cors'),
  * @private
  */
 function setRoutesAndStatic(app) {
-  
-  routes.setRoutes(app);
   // Predefined static resource directory for css, js etc.
-  // NOTE: it's important that your static middleware is 
-  // defined after the route settings (routes.setRoutes) so that 
-  // static assets aren't inadvertently taking priority over a 
-  // matching route that may have been defined.
   app.use('/public', express.static(path.join(__dirname, '../public')));
+  routes.setRoutes(app);
   routes.setErrRoutes(app);
 }
 
@@ -101,6 +95,8 @@ function setMiddleware(app) {
     // Disable views cache
     app.disable('view cache');
   } 
+  // Block the header from containing information about the server
+  app.disable('x-powered-by'); 
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
   app.use(cookieParser(config.token.secret));

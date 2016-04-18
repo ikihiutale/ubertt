@@ -7,7 +7,7 @@ function ctrl(req, res) {
   var viewModel = {
       title: "UberTT"
   };
-  res.render('login', viewModel);
+  res.render('registration', viewModel);
 } 
 
 module.exports = ctrl;
