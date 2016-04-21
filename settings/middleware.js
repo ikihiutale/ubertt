@@ -32,6 +32,7 @@ var cors = require('cors'),
     // date string formatting
     moment = require('moment'),
     favicon = require('serve-favicon'),
+    csurf = require('csurf'),
     config = require('./config'),
     routes = require('./routes'),
     logger = require('./logger');
@@ -43,12 +44,19 @@ var cors = require('cors'),
  * Router is used and it responds to requests such as 
  * GET, POST, PUT, and UPDATE.
  * Route error handling and static resource directory are 
- * also set here,
+ * also set here as well as Cross-site request forgery (CSRF)
+ * protection
  * @method setRoutesAndStatic
  * @param {object} app The express application
  * @private
  */
 function setRoutesAndStatic(app) {
+  // All forms (and AJAX calls), have to provide a field 
+  // called _csrf, which must match the generated token. 
+  app.use(function(req, res, next) {
+    res.locals._csrfToken = req.csrfToken();
+    next();
+  });
   // Predefined static resource directory for css, js etc.
   app.use('/public', express.static(path.join(__dirname, '../public')));
   routes.setRoutes(app);
@@ -100,6 +108,12 @@ function setMiddleware(app) {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
   app.use(cookieParser(config.token.secret));
+  // The way to prevent the Cross-site request forgery (CSRF) 
+  // attacks  is to pass a unique token to the browser. 
+  // When the browser then submits a form, the server checks to 
+  // make sure the token matches. The csurf middleware will handle 
+  // the token creation and verification.
+  app.use(csurf({ cookie: true }));
   // Request body parsing middleware should be above methodOverride
   app.use(methodOverride());
   // TODO uncomment after placing your favicon in /public

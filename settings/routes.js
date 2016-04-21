@@ -30,11 +30,16 @@ function setRoutes(app) {
  */
 function setErrRoutes(app) {
   app.use(function (err, req, res, next) {
+    
     // If the error object doesn't exists
     if (!err) { return next(); }
     // Log it
     logger.error('Internal error (%d - url: %s): %s', 
             res.statusCode, req.originalUrl, err.stack);
+    if (err.code === 'EBADCSRFTOKEN') {
+      // handle CSRF token errors here 
+      res.status(403).send('Bad CSRFT token - form tampered');
+    }
     // Redirect to Internal Server Error
     res.sendStatus(500);
   });

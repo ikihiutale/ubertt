@@ -9,6 +9,7 @@ function ctrl(req, res) {
       pageTitle: "Log In",
       user: null
   };
+  console.log("LOGIN: " + req.body._csrfToken);
   res.render('login', viewModel);
 } 
 
