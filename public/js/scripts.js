@@ -13,10 +13,10 @@
       });
     },   
     /**
-     * Registration
+     * Sign up  validator
      */
-    registration: function() {
-      $('#uber_registration').validate({
+    signup_validate: function() {
+      $('#uber_signup').validate({
         //framework: 'bootstrap',
         errorClass: 'control-label has-error',
         rules: {
@@ -64,16 +64,51 @@
           $(element).closest('.form-group').removeClass('has-error');
         },
         submitHandler: function(form) {
-          console.log("BUTTON");
           //form.submit();
         }
       });
-     }
+     },
+     /**
+      * Log in validator
+      */
+     login_validate: function() {
+       $('#uber_login').validate({
+         //framework: 'bootstrap',
+         errorClass: 'control-label has-error',
+         rules: {
+           uber_email: {
+             required: true,
+             email: true
+           },
+           uber_pwd1: { 
+             required: true,
+             minlength: 5
+           }
+         }, 
+         messages: {
+           uber_email: "Please enter a valid email address",
+           uber_pwd1: {
+               required: "Please provide a password",
+               minlength: "Your password must be at least 5 characters long",
+           }
+         },
+         highlight: function (element, errorClass, validClass) {
+           $(element).closest('.form-group').addClass('has-error');
+         },
+         unhighlight: function (element, errorClass, validClass) {
+           $(element).closest('.form-group').removeClass('has-error');
+         },
+         submitHandler: function(form) {
+           //form.submit();
+         }
+       });
+      } 
    };  
    W.ns = namespace;
 })(this.jQuery, window);
 
 $(function() {
     ns.setEvents();
-    ns.registration();
+    ns.signup_validate();
+    ns.login_validate();
 });

@@ -1,0 +1,32 @@
+<div class="row">
+<div class="col-md-6 col-md-offset-3">
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h1 class="panel-title pull-left">{{pageTitle}}</h1>
+    <button class="btn btn-default pull-right">&#x2717;</button>
+    <div class="clearfix"></div>
+  </div>
+  <div class="panel-body">
+  <form id="uber_login" role="form" action="/login" method="post">
+    {{!-- <legend></legend> --}}
+    <fieldset class="form-group">
+      <label for="uber_email">Email:</label>
+      <input type="email" class="form-control" id="uber_email" name="uber_email">
+    </fieldset>    
+    <fieldset class="form-group">
+      <label for="uber_pwd1">Password:</label>
+      <input type="password" class="form-control" id="uber_pwd1" name="uber_pwd1">
+    </fieldset>
+    <fieldset class="checkbox">
+      <label><input type="checkbox" id="uber_remember">Remember me</label>
+    </fieldset>
+    <fieldset class="form-group">
+      <div class="col-md-12 text-center"> 
+        <button type="submit" class="btn btn-primary btn-lg" id="uber_submit_login">Submit</button>
+      </div>
+    </fieldset>
+  </form>
+  </div>
+</div>
+</div>
+</div>

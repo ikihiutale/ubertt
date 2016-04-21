@@ -7,7 +7,7 @@ var cors = require('cors'),
     path = require('path'),
     // Automated logging of request/response
     morgan = require('morgan'),
-    helmet = require('helmet'), 
+    helmet = require('helmet'),
     express = require('express'), 
     // Templating engine 
     exphbs = require('express-handlebars'),

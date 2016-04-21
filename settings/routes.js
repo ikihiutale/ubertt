@@ -14,6 +14,11 @@ var router = require('express').Router(),
  */
 function setRoutes(app) {
   router.get('/', ctlrs.home);
+  router.get('/login', ctlrs.login);
+  router.get('/signup', ctlrs.signup);
+  
+  router.post('/login', ctlrs.login);
+  router.post('/signup', ctlrs.signup);
   app.use(router);
 }
 

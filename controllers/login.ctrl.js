@@ -1,15 +1,15 @@
 /**
- * Home page controller 
+ * Log in page controller 
  */
 'use strict';
 
 function ctrl(req, res) {
   var viewModel = {
       title: "UberTT",
-      pageTitle: "home", 
+      pageTitle: "Log In",
       user: null
   };
-  res.render('home', viewModel);
+  res.render('login', viewModel);
 } 
 
 module.exports = ctrl;
