@@ -8,7 +8,7 @@
   </div>
   <div class="panel-body">
   <form id="uber_login" role="form" action="/login" method="post">
-    {{!-- <legend></legend> --}}
+    {{!-- Cross-site request forgery (CSRF) --}}
     <input type="hidden" name="_csrf" value="{{_csrfToken}}"> 
     <fieldset class="form-group">
       <label for="uber_email">Email:</label>

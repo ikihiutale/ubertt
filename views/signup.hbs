@@ -8,7 +8,8 @@
   </div>
   <div class="panel-body">
   <form id="uber_signup" role="form" action="/signup" method="post">
-    {{!-- <legend></legend> --}}
+    {{!-- Cross-site request forgery (CSRF) --}}
+    <input type="hidden" name="_csrf" value="{{_csrfToken}}"> 
     <fieldset class="form-group">
       <label for="uber_forename">Forename:</label>
       <input type="text" class="form-control" id="uber_forename" name="uber_forename">
