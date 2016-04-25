@@ -12,13 +12,14 @@ var router = require('express').Router(),
  * @param {object} app The express application
  * @private
  */
-function setRoutes(app) {
+function setRoutes(app, passport) {
   router.get('/', ctlrs.home);
   router.get('/login', ctlrs.login);
   router.get('/signup', ctlrs.signup);
   
-  router.post('/login', ctlrs.login);
-  router.post('/signup', ctlrs.signup);
+  //router.route('/signin').post(auth.signin);
+  //router.route('/signout').get(auth.signout);
+  //router.route('/signup').post(auth.signup);
   app.use(router);
 }
 

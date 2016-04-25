@@ -7,10 +7,14 @@
      * Events
      */
     setEvents: function() {
-      $(".nav a").on("click", function(){
-        $(".nav").find(".active").removeClass("active");
-        $(this).parent().addClass("active");
+      // Redirect to root when close btn is clicked 
+      $('#uber_close_icon').click(function(){
+        document.location.replace("/");
       });
+      
+      // Activate menu bar button when page is loaded
+      $('a[href="' + location.pathname + '"]').parent().addClass('active');
+      
     },   
     /**
      * Sign up  validator

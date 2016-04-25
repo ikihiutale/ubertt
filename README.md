@@ -4,8 +4,9 @@ Timetable
 =======
 
 
-# ubertt
-
+# Authentication
+Users are authenticated against user details stored in Mongo DB and by using 
+Local Authentication Strategy of Passport.
 
 
 ## Usage

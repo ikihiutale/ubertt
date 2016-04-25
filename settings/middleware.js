@@ -9,6 +9,7 @@ var cors = require('cors'),
     morgan = require('morgan'),
     helmet = require('helmet'),
     express = require('express'), 
+    session = require('express-session'),
     // Templating engine 
     exphbs = require('express-handlebars'),
     // Helps parsing any form fields that are submitted 
@@ -23,8 +24,6 @@ var cors = require('cors'),
     // REST HTTP verbs the methodOverride allows 
     // this to be faked using a special hidden input field
     methodOverride = require('method-override'),
-    // Allows cookies to be sent and received
-    cookieParser = require('cookie-parser'),
     // Handles any errors that occur throughout 
     // the entire middleware process
     errorHandler = require('errorhandler'),
@@ -33,11 +32,58 @@ var cors = require('cors'),
     moment = require('moment'),
     favicon = require('serve-favicon'),
     csurf = require('csurf'),
+    passport = require('passport'),
+    flash = require('connect-flash'),
     config = require('./config'),
     routes = require('./routes'),
     logger = require('./logger');
 
-
+/**
+ * Initialize and set Passport
+ * @method setPassport
+ * @param {object} app The express application
+ * @private
+ */
+function setPassport(app) {
+  
+  var sess = {
+      secret: config.token.secret,
+      cookie: {},
+      // Forces the session to be saved back to the session store, 
+      // even if the session was never modified during the request
+      resave: false,
+      // If true forces a session that is "uninitialized" to be saved to the store
+      saveUninitialized: false
+  };
+  if (config.environment !== 'development') {
+    // Cookie with secure: true is a recommended option. However, it 
+    // requires an https-enabled website, i.e., HTTPS is necessary 
+    // for secure cookies. If secure is set, and you access your site 
+    // over HTTP, the cookie will not be set. If you have your node.js behind 
+    // a proxy and are using secure: true, you need to set "trust proxy" in express
+    app.set('trust proxy', 1);
+    // Serve secure cookies
+    sess.cookie.secure = true;
+  }
+  app.use(session(sess));
+  app.use(passport.initialize());
+  // Persistent login sessions
+  app.use(passport.session());
+  // Use connect-flash for flash messages stored in session
+  app.use(flash()); 
+  // The way to prevent the Cross-site request forgery (CSRF) 
+  // attacks  is to pass a unique token to the browser. 
+  // When the browser then submits a form, the server checks to 
+  // make sure the token matches. The csurf middleware will handle 
+  // the token creation and verification.
+  app.use(csurf());
+  // All forms (and AJAX calls), have to provide a field 
+  // called _csrf, which must match the generated token. 
+  app.use(function(req, res, next) {
+    res.locals._csrfToken = req.csrfToken();
+    next();
+  });
+}
 
 /**
  * Wire up our routes via the app object.
@@ -51,15 +97,11 @@ var cors = require('cors'),
  * @private
  */
 function setRoutesAndStatic(app) {
-  // All forms (and AJAX calls), have to provide a field 
-  // called _csrf, which must match the generated token. 
-  app.use(function(req, res, next) {
-    res.locals._csrfToken = req.csrfToken();
-    next();
-  });
+  // Set Passport before routes
+  setPassport(app);
   // Predefined static resource directory for css, js etc.
   app.use('/public', express.static(path.join(__dirname, '../public')));
-  routes.setRoutes(app);
+  routes.setRoutes(app, passport);
   routes.setErrRoutes(app);
 }
 
@@ -97,7 +139,7 @@ function setViewEngine(app) {
 function setMiddleware(app) {
   // Environment dependent middleware
   if (config.environment === 'development') {
-    // Enable logger (morgan)
+    // Log every request to the console
     app.use(morgan('dev', { "stream": logger.stream }));
     // app.use(morgan('dev'));
     // Disable views cache
@@ -105,21 +147,15 @@ function setMiddleware(app) {
   } 
   // Block the header from containing information about the server
   app.disable('x-powered-by'); 
+  // Get information from html forms
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
-  app.use(cookieParser(config.token.secret));
-  // The way to prevent the Cross-site request forgery (CSRF) 
-  // attacks  is to pass a unique token to the browser. 
-  // When the browser then submits a form, the server checks to 
-  // make sure the token matches. The csurf middleware will handle 
-  // the token creation and verification.
-  app.use(csurf({ cookie: true }));
   // Request body parsing middleware should be above methodOverride
   app.use(methodOverride());
   // TODO uncomment after placing your favicon in /public
   // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
   setViewEngine(app);
-  
+  // Set routes
   setRoutesAndStatic(app);
   if (config.environment === 'development') {   
     app.use(errorHandler()); 
