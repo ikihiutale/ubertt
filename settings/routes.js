@@ -8,18 +8,41 @@ var router = require('express').Router(),
     ctlrs = require('../controllers');
 
 /**
+ * Make sure a user is logged in
+ * @method isLoggedIn
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
+ * @private
+ */
+function isLoggedIn(req, res, next) {
+  // If user is authenticated in the session, carry on 
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  // If they aren't redirect them to the home page
+  res.redirect('/');
+}
+
+/**
  * Set user routes.
  * @param {object} app The express application
  * @private
  */
 function setRoutes(app, passport) {
   router.get('/', ctlrs.home);
+  
   router.get('/login', ctlrs.login);
   router.get('/signup', ctlrs.signup);
-  
-  //router.route('/signin').post(auth.signin);
-  //router.route('/signout').get(auth.signout);
   //router.route('/signup').post(auth.signup);
+  //router.route('/signin').post(auth.signin);
+  
+  router.route('/signout').get(function(req, res) {
+    req.logout();
+    res.redirect('/');
+  });
+
+  router.get('/profile', isLoggedIn, ctlrs.profile);
   app.use(router);
 }
 

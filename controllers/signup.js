@@ -7,7 +7,8 @@ function ctrl(req, res) {
   var viewModel = {
       title: "UberTT",
       pageTitle: "Sign Up",
-      user: null
+      user: null,
+      message: req.flash('signupMessage')
   };
   res.render('signup', viewModel);
 } 
