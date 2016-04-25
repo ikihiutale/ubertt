@@ -71,6 +71,11 @@ function setPassport(app) {
   app.use(passport.session());
   // Use connect-flash for flash messages stored in session
   app.use(flash()); 
+  app.use(function(req, res, next){
+    res.locals.success = req.flash('success');
+    res.locals.errors = req.flash('error');
+    next();
+  });
   // The way to prevent the Cross-site request forgery (CSRF) 
   // attacks  is to pass a unique token to the browser. 
   // When the browser then submits a form, the server checks to 

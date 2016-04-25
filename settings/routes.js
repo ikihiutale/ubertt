@@ -21,6 +21,7 @@ function isLoggedIn(req, res, next) {
     return next();
   }
   // If they aren't redirect them to the home page
+  req.flash('error', 'Could not update your name, please contact our support team');
   res.redirect('/');
 }
 
@@ -30,18 +31,37 @@ function isLoggedIn(req, res, next) {
  * @private
  */
 function setRoutes(app, passport) {
+  // Displays home page
   router.get('/', ctlrs.home);
-  
+  // Displays sign up and log in pages  
   router.get('/login', ctlrs.login);
   router.get('/signup', ctlrs.signup);
-  //router.route('/signup').post(auth.signup);
-  //router.route('/signin').post(auth.signin);
   
-  router.route('/signout').get(function(req, res) {
+  // Sends the request through the local sign up strategy, 
+  // and if successful takes user to home page, otherwise returns to log in page
+  app.post('/signup', passport.authenticate('local_signup', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+  }));
+
+  // Sends the request through the local log in strategy, and if successful 
+  // takes user to homepage, otherwise returns then to signin page
+  app.post('/login', passport.authenticate('local_signin', {
+    successRedirect: '/',
+    failureRedirect: '/signin'
+    })
+  );
+  
+  // Logs user out of site, deleting them from the session, 
+  // and returns to home page
+  app.get('/signout', function(req, res){
+    var name = req.user.username;
+    console.log("LOGGIN OUT " + req.user.username);
     req.logout();
     res.redirect('/');
+    req.session.notice = "You have successfully been logged out " + name + "!";
   });
-
+  
   router.get('/profile', isLoggedIn, ctlrs.profile);
   app.use(router);
 }

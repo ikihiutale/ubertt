@@ -68,7 +68,8 @@
           $(element).closest('.form-group').removeClass('has-error');
         },
         submitHandler: function(form) {
-          //form.submit();
+          console.log("JEEEEEE");
+          form.submit();
         }
       });
      },
@@ -103,7 +104,7 @@
            $(element).closest('.form-group').removeClass('has-error');
          },
          submitHandler: function(form) {
-           //form.submit();
+           form.submit();
          }
        });
       } 

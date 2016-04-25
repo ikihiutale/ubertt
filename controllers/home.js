@@ -7,7 +7,7 @@ function ctrl(req, res) {
   var viewModel = {
       title: "UberTT",
       pageTitle: "Home", 
-      user: null
+      user: req.user
   };
   res.render('home', viewModel);
 } 
