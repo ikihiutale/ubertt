@@ -10,8 +10,10 @@ var cors = require('cors'),
     helmet = require('helmet'),
     express = require('express'), 
     session = require('express-session'),
+    flash = require('connect-flash'),
     // Templating engine 
     exphbs = require('express-handlebars'),
+    cookieParser = require('cookie-parser'),
     // Helps parsing any form fields that are submitted 
     // via a HTML form submission from a browser
     bodyParser = require('body-parser'),
@@ -33,82 +35,9 @@ var cors = require('cors'),
     favicon = require('serve-favicon'),
     csurf = require('csurf'),
     passport = require('passport'),
-    flash = require('connect-flash'),
     config = require('./config'),
     routes = require('./routes'),
     logger = require('./logger');
-
-/**
- * Initialize and set Passport
- * @method setPassport
- * @param {object} app The express application
- * @private
- */
-function setPassport(app) {
-  
-  var sess = {
-      secret: config.token.secret,
-      cookie: {},
-      // Forces the session to be saved back to the session store, 
-      // even if the session was never modified during the request
-      resave: false,
-      // If true forces a session that is "uninitialized" to be saved to the store
-      saveUninitialized: false
-  };
-  if (config.environment !== 'development') {
-    // Cookie with secure: true is a recommended option. However, it 
-    // requires an https-enabled website, i.e., HTTPS is necessary 
-    // for secure cookies. If secure is set, and you access your site 
-    // over HTTP, the cookie will not be set. If you have your node.js behind 
-    // a proxy and are using secure: true, you need to set "trust proxy" in express
-    app.set('trust proxy', 1);
-    // Serve secure cookies
-    sess.cookie.secure = true;
-  }
-  app.use(session(sess));
-  app.use(passport.initialize());
-  // Persistent login sessions
-  app.use(passport.session());
-  // Use connect-flash for flash messages stored in session
-  app.use(flash()); 
-  app.use(function(req, res, next){
-    res.locals.success = req.flash('success');
-    res.locals.errors = req.flash('error');
-    next();
-  });
-  // The way to prevent the Cross-site request forgery (CSRF) 
-  // attacks  is to pass a unique token to the browser. 
-  // When the browser then submits a form, the server checks to 
-  // make sure the token matches. The csurf middleware will handle 
-  // the token creation and verification.
-  app.use(csurf());
-  // All forms (and AJAX calls), have to provide a field 
-  // called _csrf, which must match the generated token. 
-  app.use(function(req, res, next) {
-    res.locals._csrfToken = req.csrfToken();
-    next();
-  });
-}
-
-/**
- * Wire up our routes via the app object.
- * Router is used and it responds to requests such as 
- * GET, POST, PUT, and UPDATE.
- * Route error handling and static resource directory are 
- * also set here as well as Cross-site request forgery (CSRF)
- * protection
- * @method setRoutesAndStatic
- * @param {object} app The express application
- * @private
- */
-function setRoutesAndStatic(app) {
-  // Set Passport before routes
-  setPassport(app);
-  // Predefined static resource directory for css, js etc.
-  app.use('/public', express.static(path.join(__dirname, '../public')));
-  routes.setRoutes(app, passport);
-  routes.setErrRoutes(app);
-}
 
 /**
  * Set Handlerbars as the template engine with 
@@ -137,6 +66,107 @@ function setViewEngine(app) {
 }
 
 /**
+ * Set session
+ * @method setSession
+ * @param {object} app The express application
+ * @private
+ */
+function setSession(app) {
+  // Session parameters
+  var sess = {
+      secret: config.token.secret,
+      cookie: { secure: false },
+      // Forces the session to be saved back to the session store, 
+      // even if the session was never modified during the request
+      resave: false,
+      // If true forces a session that is "uninitialized" to be saved 
+      // to the store
+      saveUninitialized: true
+  };
+  if (config.environment !== 'development') {
+    // Cookie with secure: true is a recommended option. However, it 
+    // requires an https-enabled website, i.e., HTTPS is necessary 
+    // for secure cookies. If secure is set, and you access your site 
+    // over HTTP, the cookie will not be set. If you have your node.js behind 
+    // a proxy and are using secure: true, you need to set "trust proxy" in express
+    // app.set('trust proxy', 1);
+    
+    // Serve secure cookies
+    // sess.cookie.secure = true;
+  }
+  app.use(session(sess));
+}
+
+/**
+ * Set flash messages
+ * @method setFlashMsg
+ * @param {object} app The express application
+ * @private
+ */
+function setFlashMsg(app) {
+  // Use connect-flash for flash messages stored in session
+  app.use(flash()); 
+  
+  // Ensures that flash messages will be available to 
+  // the template as locals.
+  app.use(function(req, res, next){
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    res.locals.notice = req.flash('error');
+    next();
+  });
+}
+  
+/**
+ * Set Passport
+ * @method setFlashMsg
+ * @param {object} app The express application
+ * @private
+ */
+function setPassport(app) {
+  app.use(passport.initialize());
+  // Persistent login sessions
+  app.use(passport.session());
+}
+
+/**
+ * Set Cross-site request forgery prevent module
+ * @method setCSURF
+ * @param {object} app The express application
+ * @private
+ */
+function setCSURF(app) {
+  // The way to prevent the Cross-site request forgery (CSRF) 
+  // attacks  is to pass a unique token to the browser. 
+  // When the browser then submits a form, the server checks to 
+  // make sure the token matches. The csurf middleware will handle 
+  // the token creation and verification.
+  app.use(csurf());
+  // All forms (and AJAX calls), have to provide a field 
+  // called _csrf, which must match the generated token. 
+  app.use(function(req, res, next) {
+    res.locals._csrfToken = req.csrfToken();
+    next();
+  });
+}
+
+/**
+ * Wire up our routes via the app object.
+ * Router is used and it responds to requests such as 
+ * GET, POST, PUT, and UPDATE.
+ * Route error handling is also set here.
+ * @method setRoutesAndStatic
+ * @param {object} app The express application
+ * @private
+ */
+function setRoutes(app) {
+  // Predefined static resource directory for css, js etc.
+  app.use('/public', express.static(path.join(__dirname, '../public')));
+  routes.setRoutes(app, passport);
+  routes.setErrRoutes(app);
+}
+
+/**
  * Initialize the application middleware.
  * @param {object} app The express application
  * @private
@@ -155,13 +185,18 @@ function setMiddleware(app) {
   // Get information from html forms
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
+  // TODO app.use(cookieParser());
   // Request body parsing middleware should be above methodOverride
   app.use(methodOverride());
   // TODO uncomment after placing your favicon in /public
   // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
   setViewEngine(app);
   // Set routes
-  setRoutesAndStatic(app);
+  setSession(app);
+  setFlashMsg(app);
+  setPassport(app);
+  setCSURF(app);
+  setRoutes(app);
   if (config.environment === 'development') {   
     app.use(errorHandler()); 
   }
@@ -203,17 +238,6 @@ function setCors(app) {
     next();
   });
 }
-
-/**
- * Configure app modules config files.
- *
- * @method initGonfig
- * @param {Object} app The express application
- * @private
- */
-function initGonfig(app) {
-}
-
 
 /**
  * Initialize the Express application.

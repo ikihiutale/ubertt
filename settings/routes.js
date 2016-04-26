@@ -20,6 +20,7 @@ function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
+  console.log('miksi ei');
   // If they aren't redirect them to the home page
   req.flash('error', 'Could not update your name, please contact our support team');
   res.redirect('/');
@@ -74,7 +75,6 @@ function setRoutes(app, passport) {
  */
 function setErrRoutes(app) {
   app.use(function (err, req, res, next) {
-    
     // If the error object doesn't exists
     if (!err) { return next(); }
     // Log it

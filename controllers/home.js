@@ -10,6 +10,7 @@ function ctrl(req, res) {
       user: req.user
   };
   res.render('home', viewModel);
+
 } 
 
 module.exports = ctrl;
