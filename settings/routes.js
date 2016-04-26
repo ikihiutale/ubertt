@@ -20,7 +20,6 @@ function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
-  console.log('miksi ei');
   // If they aren't redirect them to the home page
   req.flash('error', 'Could not update your name, please contact our support team');
   res.redirect('/');
@@ -34,17 +33,11 @@ function isLoggedIn(req, res, next) {
 function setRoutes(app, passport) {
   // Displays home page
   router.get('/', ctlrs.home);
+  
   // Displays sign up and log in pages  
   router.get('/login', ctlrs.login);
   router.get('/signup', ctlrs.signup);
   
-  // Sends the request through the local sign up strategy, 
-  // and if successful takes user to home page, otherwise returns to log in page
-  app.post('/signup', passport.authenticate('local_signup', {
-    successRedirect: '/',
-    failureRedirect: '/login'
-  }));
-
   // Sends the request through the local log in strategy, and if successful 
   // takes user to homepage, otherwise returns then to signin page
   app.post('/login', passport.authenticate('local_signin', {
@@ -53,14 +46,19 @@ function setRoutes(app, passport) {
     })
   );
   
+  // Sends the request through the local sign up strategy, 
+  // and if successful takes user to home page, otherwise returns to log in page
+  app.post('/signup', passport.authenticate('local_signup', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+  }));
+  
   // Logs user out of site, deleting them from the session, 
   // and returns to home page
   app.get('/signout', function(req, res){
-    var name = req.user.username;
-    console.log("LOGGIN OUT " + req.user.username);
     req.logout();
+    req.flash('success', 'You have successfully been logged out');
     res.redirect('/');
-    req.session.notice = "You have successfully been logged out " + name + "!";
   });
   
   router.get('/profile', isLoggedIn, ctlrs.profile);

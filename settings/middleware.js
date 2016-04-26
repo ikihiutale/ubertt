@@ -112,7 +112,10 @@ function setFlashMsg(app) {
   app.use(function(req, res, next){
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
-    res.locals.notice = req.flash('error');
+    res.locals.notice = req.flash('notice');
+    delete req.session.error;
+    delete req.session.success;
+    delete req.session.notice;
     next();
   });
 }
@@ -187,7 +190,7 @@ function setMiddleware(app) {
   app.use(bodyParser.json());
   // TODO app.use(cookieParser());
   // Request body parsing middleware should be above methodOverride
-  app.use(methodOverride());
+  app.use(methodOverride('X-HTTP-Method-Override'));
   // TODO uncomment after placing your favicon in /public
   // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
   setViewEngine(app);
