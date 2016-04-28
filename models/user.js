@@ -6,6 +6,8 @@
 var mongoose = require('mongoose'),
     bcrypt = require('bcrypt-nodejs');
 
+var SALT_VALUE = 10;
+
 /**
  * Define our user schema
  */
@@ -75,7 +77,7 @@ UserSchema.pre('save', function(cb) {
   }
   
   // Password changed so it need to be hashed
-  bcrypt.genSalt(8, function(err, salt) {
+  bcrypt.genSalt(SALT_VALUE, function(err, salt) {
     if (err) {
       return cb(err);
     }
@@ -106,7 +108,7 @@ bcrypt.hash("bacon", null, null, function(err, hash) {
 });
 
 UserSchema.methods.generateHash = function(password) {
-  return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(SALT_VALUE), null);
 };
 
 module.exports = mongoose.model('User', UserSchema);

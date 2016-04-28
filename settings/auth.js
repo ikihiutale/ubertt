@@ -5,6 +5,7 @@
 
 var passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
+    logger = require('./settings/logger'),
     User = require('../models/user');
 
 /**
@@ -18,23 +19,25 @@ var passport = require('passport'),
 function localStrategy() {
   passport.use(new LocalStrategy({
     usernameField: 'email',
-    passwordField: 'password'
+    passwordField: 'password',
+    passReqToCallback : true
   },
-  function(email, password, cb) {
+  function(req, email, password, cb) {
+    logger.debug("Passport email: " + email + ", passwd: " + password);
     User.findOne({
       email: email.toLowerCase()
     }, function(err, user) {
       if (err) { return cb(err); }
         // No user found with that email
         if (!user) {
-          return cb(null, false, { message: 'The email is not found' });
+          return cb(null, false, { error: 'The email is not found' });
         }
         // make sure the password is correct
         user.comparePassword(password, function(err, isMatch) {
           if (err) { return cb(err); }
           // Check if passwords didn't match
           if (!isMatch) {
-            return cb(null, false, { message: 'The password is not correct.' });
+            return cb(null, false, { error: 'The password is not correct.' });
           }
           // Success  
           return cb(null, user);
@@ -61,11 +64,13 @@ function init(app) {
   // serializing, and querying the user record by ID from the database when
   // deserializing.
   passport.serializeUser(function(user, cb) {
+    logger.debug("Passport serialized user id: " + user.id);
     cb(null, user.id);
   });
 
   passport.deserializeUser(function(id, cb) {
     User.findById(id, function(err, user) {
+      logger.debug("Passport deserialized user id: " + user.id);
       cb(err, user);
     });
   });

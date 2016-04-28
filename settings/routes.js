@@ -22,7 +22,7 @@ function isLoggedIn(req, res, next) {
     return next();
   }
   // If they aren't redirect them to the home page
-  req.flash('error', 'Could not update your name, please contact our support team');
+  req.flash('error', 'Not  logged in');
   res.redirect('/');
 }
 
@@ -37,26 +37,23 @@ function setRoutes(app, passport) {
   
   // Displays sign up and log in pages  
   router.get('/login', ctlrs.login);
-  router.get('/signup', ctlrs.signup);
+  router.get('/signup', ctlrs.signup)
+        .post('/signup', ctlrs.signup)
+  
 
   // Sends the request through the local log in strategy, and if successful 
   // takes user to homepage, otherwise returns then to signin page
-  app.post('/login', passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/signup'
+  router.post('/login', passport.authenticate('local', {
+      successRedirect: '/',
+      failureRedirect: '/signup',
+      failureFlash: true
     })
   );
   
-  // Sends the request through the local sign up strategy, 
-  // and if successful takes user to home page, otherwise returns to log in page
-  app.post('/signup', passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login'
-  }));
   
   // Logs user out of site, deleting them from the session, 
   // and returns to home page
-  app.get('/signout', function(req, res){
+  router.get('/signout', function(req, res){
     req.logout();
     req.flash('success', 'You have successfully been logged out');
     res.redirect('/');
