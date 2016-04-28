@@ -1,3 +1,0 @@
-/**
- * Local passport strategy
- */

@@ -1,9 +1,10 @@
 /**
- * Routes.
+ * Api routes.
  */
 'use strict';
 
 var router = require('express').Router(),
+    passport = require('passport'),
     logger = require('./logger'),
     ctlrs = require('../controllers');
 
@@ -37,18 +38,18 @@ function setRoutes(app, passport) {
   // Displays sign up and log in pages  
   router.get('/login', ctlrs.login);
   router.get('/signup', ctlrs.signup);
-  
+
   // Sends the request through the local log in strategy, and if successful 
   // takes user to homepage, otherwise returns then to signin page
-  app.post('/login', passport.authenticate('local_signin', {
+  app.post('/login', passport.authenticate('local', {
     successRedirect: '/',
-    failureRedirect: '/signin'
+    failureRedirect: '/signup'
     })
   );
   
   // Sends the request through the local sign up strategy, 
   // and if successful takes user to home page, otherwise returns to log in page
-  app.post('/signup', passport.authenticate('local_signup', {
+  app.post('/signup', passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/login'
   }));

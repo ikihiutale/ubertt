@@ -37,7 +37,58 @@ var cors = require('cors'),
     passport = require('passport'),
     config = require('./config'),
     routes = require('./routes'),
+    auth = require('./auth'),
     logger = require('./logger');
+
+/**
+ * Set session
+ * @method setSession
+ * @param {object} app The express application
+ * @private
+ */
+function setSession(app) {
+  // Session parameters
+  // Note: Passport does not directly manage your session, it 
+  // only uses the session so you configure session attributes 
+  // (e.g. life of your session) via express
+  var sess = {
+      secret: config.token.secret,
+      cookie: { 
+        // Tell browsers to only send this cookie in requests going 
+        // to HTTPS endpoints
+        secure: false, 
+        // Tell browsers to not allow client side script access to the cookie
+        httpOnly: true, 
+        // Configure when sessions expires
+        maxAge: config.token.expiration 
+      },
+      // Forces the session to be saved back to the session store, 
+      // even if the session was never modified during the request
+      resave: false,
+      // If true forces a session that is "uninitialized" to be saved 
+      // to the store
+      saveUninitialized: true
+  };
+  if (config.environment !== 'development') {
+    // Cookie with secure: true is a recommended option. However, it 
+    // requires an https-enabled website, i.e., HTTPS is necessary 
+    // for secure cookies. If secure is set, and you access your site 
+    // over HTTP, the cookie will not be set. If you have your node.js behind 
+    // a proxy and are using secure: true, you need to set "trust proxy" in express
+    app.set('trust proxy', 1);
+    
+    // Serve secure cookies
+    // sess.cookie.secure = true;
+  }
+  // Predefined static resource directory for css, js etc.
+  //
+  // NOTE: if you add the session middleware before your static directory, 
+  // Express will generate sessions for requests on static files like 
+  // stylesheets, images, and JavaScript.
+  app.use('/public', express.static(path.join(__dirname, '../public')));  
+  app.use(cookieParser(config.token.secret));
+  app.use(session(sess));
+}
 
 /**
  * Set Handlerbars as the template engine with 
@@ -66,38 +117,6 @@ function setViewEngine(app) {
 }
 
 /**
- * Set session
- * @method setSession
- * @param {object} app The express application
- * @private
- */
-function setSession(app) {
-  // Session parameters
-  var sess = {
-      secret: config.token.secret,
-      cookie: { secure: false },
-      // Forces the session to be saved back to the session store, 
-      // even if the session was never modified during the request
-      resave: false,
-      // If true forces a session that is "uninitialized" to be saved 
-      // to the store
-      saveUninitialized: true
-  };
-  if (config.environment !== 'development') {
-    // Cookie with secure: true is a recommended option. However, it 
-    // requires an https-enabled website, i.e., HTTPS is necessary 
-    // for secure cookies. If secure is set, and you access your site 
-    // over HTTP, the cookie will not be set. If you have your node.js behind 
-    // a proxy and are using secure: true, you need to set "trust proxy" in express
-    // app.set('trust proxy', 1);
-    
-    // Serve secure cookies
-    // sess.cookie.secure = true;
-  }
-  app.use(session(sess));
-}
-
-/**
  * Set flash messages
  * @method setFlashMsg
  * @param {object} app The express application
@@ -122,14 +141,13 @@ function setFlashMsg(app) {
   
 /**
  * Set Passport
+ * 
  * @method setFlashMsg
  * @param {object} app The express application
  * @private
  */
 function setPassport(app) {
-  app.use(passport.initialize());
-  // Persistent login sessions
-  app.use(passport.session());
+  auth.init(app);
 }
 
 /**
@@ -163,8 +181,6 @@ function setCSURF(app) {
  * @private
  */
 function setRoutes(app) {
-  // Predefined static resource directory for css, js etc.
-  app.use('/public', express.static(path.join(__dirname, '../public')));
   routes.setRoutes(app, passport);
   routes.setErrRoutes(app);
 }
@@ -188,15 +204,17 @@ function setMiddleware(app) {
   // Get information from html forms
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
-  // TODO app.use(cookieParser());
   // Request body parsing middleware should be above methodOverride
   app.use(methodOverride('X-HTTP-Method-Override'));
   // TODO uncomment after placing your favicon in /public
   // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-  setViewEngine(app);
-  // Set routes
   setSession(app);
+  setViewEngine(app);
   setFlashMsg(app);
+  // Persistent login sessions.
+  // Note: the express.session() need to be 
+  // before passport.session() to ensure that the 
+  // login session is restored in the correct order
   setPassport(app);
   setCSURF(app);
   setRoutes(app);
