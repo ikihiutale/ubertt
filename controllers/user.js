@@ -7,7 +7,7 @@
  * Module dependencies.
  */
 var logger = require('../settings/logger'),
-    User   = require('../model/user');
+    User   = require('../models/user');
 
 /**
  * Create user.
@@ -18,44 +18,27 @@ var logger = require('../settings/logger'),
  * @api public
  */
 function create(req, res) {
-  var user = new User();
-  image.fileName = req.files.image.name;
-  image.url = path.join(req.body.url, req.files.image.path);
-  image.user = req.body.userId;
-
-  image.save(function(err, image) {
+  logger.debug("+++ ctrl-user-crete");
+  var user = new User({
+    forename: req.body.uber_forename,
+    surname: req.body.uber_surname,
+    email: req.body.uber_email,
+    password: req.body.uber_pwd1
+  });
+  user.save(function(err) {
       if (err) {
           logger.error(err.message);
-          return res.status(400).send(err);
-      } else {
-          res.status(201).json(image);
+          // return res.status(400).send(err);
+          req.flash("error", err.message);
+          res.redirect('/signup')
+      } 
+      else {
+        logger.debug("User created: " + user._id);
+        req.flash("info", "User created");
+        res.redirect('/');
       }
   });
-}
-
-
-module.exports = {
-create: create,
-  findAll: findAll
-};
-
-/**
- * Find an user by id.
- *
- * @param {Object} req The request object
- * @param {Object} res The request object
- * @returns {Object} the user corresponding to the specified id
- * @api public
- */
-function findById(req, res) {
-  return User.findById(req.params.id, 'name email avatar', function (err, user) {
-        if (err) {
-            logger.error(err.message);
-            return res.status(400).send(err);
-        } else {
-            res.json(user);
-        }
-    });
+  logger.debug("--- ctrl-user-crete");
 }
 
 /**
@@ -77,6 +60,6 @@ function findAll(req, res) {
 }
 
 module.exports = {
-    findById: findById,
+    create: create,
     findAll: findAll
 };

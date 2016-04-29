@@ -38,7 +38,7 @@ function setRoutes(app, passport) {
   // Displays sign up and log in pages  
   router.get('/login', ctlrs.login);
   router.get('/signup', ctlrs.signup)
-        .post('/signup', ctlrs.signup)
+        .post('/signup', ctlrs.user.create)
   
 
   // Sends the request through the local log in strategy, and if successful 

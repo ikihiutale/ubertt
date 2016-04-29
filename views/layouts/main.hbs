@@ -2,20 +2,39 @@
 <html lang="en">
 {{>head}}
 <body>
+
+  {{!-- ** HEADER ** --}}
+  
   {{>header}}
+  
+  {{!-- ** CONTENT **  --}}
+  
   <div class="container">
-  {{#if error}}
-    <p class="alert alert-warning">{{error}}</p>
-  {{/if}}
-
-  {{#if success}}
-     <p class="alert alert-success">{{success}}</p>
-  {{/if}}
-
-  {{#if notice}}
-    <p class="alert alert-info">{{notice}}</p>
-  {{/if}}
   <div class="row">
+  
+  {{!-- ** FLASH MESSAGES ** --}}
+
+  {{#if error}}
+<div class="alert alert-warning alert-dismissible fade in" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <strong>{{error}}</strong> You should check in on some of those fields below.
+</div>
+
+  {{/if}}
+  {{#if notice}}
+    <div class="alert alert-warning" role="alert">
+      <a class="close" data-dismiss="warning">&#x2717;</a>  
+      <strong>{{notice}}</strong>
+    </div>
+  {{/if}}
+  {{#if success}}
+    <div class="alert alert-success" role="alert">  
+      <a class="close" data-dismiss="success">&#x2717;</a>  
+      <strong>{{success}}</strong>  
+    </div>  
+  {{/if}}
     {{!--
       {{log this}}
     --}}
@@ -24,6 +43,9 @@
     </div>
   </div>
   </div>
+  
+  {{!-- ** FOOTER ** --}}
+  
   {{>footer}}
 </body>
 </html>
