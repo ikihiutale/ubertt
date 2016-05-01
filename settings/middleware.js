@@ -13,6 +13,7 @@ var cors = require('cors'),
     flash = require('connect-flash'),
     // Templating engine 
     exphbs = require('express-handlebars'),
+    Handlebars = require('handlebars'),
     cookieParser = require('cookie-parser'),
     // Helps parsing any form fields that are submitted 
     // via a HTML form submission from a browser
@@ -99,11 +100,19 @@ function setSession(app) {
  */
 function setViewEngine(app) {
   var hbs = exphbs.create({    
-    defaultLayout: 'main',    
+    defaultLayout: 'main',  
+    handlebars: Handlebars,
     layoutsDir: path.join(app.get('views'), '/layouts'),    
     partialsDir: [path.join(app.get('views'), '/partials')],
     extname: '.hbs',
     helpers: {
+      wrapText: function (text) {
+        text = Handlebars.Utils.escapeExpression(text);
+        console.log("EK: " + text);
+        text = text.replace(/(\r\n|\n|\r)/gm, '<br>');
+        console.log("EK 2: " + text);
+        return new Handlebars.SafeString(text);
+      },
       foo: function () { return 'FOO!'; },
       bar: function () { return 'BAR!'; }
     }});

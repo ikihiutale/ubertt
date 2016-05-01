@@ -15,24 +15,23 @@
   {{!-- ** FLASH MESSAGES ** --}}
 
   {{#if error}}
-<div class="alert alert-warning alert-dismissible fade in" role="alert">
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-  <strong>{{error}}</strong> You should check in on some of those fields below.
-</div>
-
+    <div class="alert alert-warning alert-dismissible fade in" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&#x2717;</span>
+      </button>
+      <strong>{{wrapText error}}</strong>
+    </div>
   {{/if}}
   {{#if notice}}
     <div class="alert alert-warning" role="alert">
       <a class="close" data-dismiss="warning">&#x2717;</a>  
-      <strong>{{notice}}</strong>
+      <strong>{{wrapText notice}}</strong>
     </div>
   {{/if}}
   {{#if success}}
     <div class="alert alert-success" role="alert">  
       <a class="close" data-dismiss="success">&#x2717;</a>  
-      <strong>{{success}}</strong>  
+      <strong>{{wrapText success}}</strong>  
     </div>  
   {{/if}}
     {{!--
