@@ -13,6 +13,7 @@ var cors = require('cors'),
     flash = require('connect-flash'),
     // Templating engine 
     exphbs = require('express-handlebars'),
+    validator = require('express-validator'),
     Handlebars = require('handlebars'),
     cookieParser = require('cookie-parser'),
     // Helps parsing any form fields that are submitted 
@@ -40,6 +41,19 @@ var cors = require('cors'),
     routes = require('./routes'),
     auth = require('./auth'),
     logger = require('./logger');
+
+/**
+ * Set validator
+ * @method setValidator
+ * @param {object} app The express application
+ * @private
+ */
+function setValidator(app) {
+  app.use(validator({
+    customValidators: {
+    }
+  }));  
+}
 
 /**
  * Set session
@@ -213,6 +227,7 @@ function setMiddleware(app) {
   // Get information from html forms
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
+  setValidator(app);
   // Request body parsing middleware should be above methodOverride
   app.use(methodOverride('X-HTTP-Method-Override'));
   // TODO uncomment after placing your favicon in /public
