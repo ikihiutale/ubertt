@@ -10,11 +10,13 @@ var cors = require('cors'),
     helmet = require('helmet'),
     express = require('express'), 
     session = require('express-session'),
+    // Used for flash messages stored in session
     flash = require('connect-flash'),
     // Templating engine 
     exphbs = require('express-handlebars'),
     validator = require('express-validator'),
     Handlebars = require('handlebars'),
+    // Read cookies (needed for auth)
     cookieParser = require('cookie-parser'),
     // Helps parsing any form fields that are submitted 
     // via a HTML form submission from a browser
@@ -122,9 +124,7 @@ function setViewEngine(app) {
     helpers: {
       wrapText: function (text) {
         text = Handlebars.Utils.escapeExpression(text);
-        console.log("EK: " + text);
         text = text.replace(/(\r\n|\n|\r)/gm, '<br>');
-        console.log("EK 2: " + text);
         return new Handlebars.SafeString(text);
       },
       foo: function () { return 'FOO!'; },
@@ -227,6 +227,8 @@ function setMiddleware(app) {
   // Get information from html forms
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
+  // This must come before the router middleware and 
+  // after body parser 
   setValidator(app);
   // Request body parsing middleware should be above methodOverride
   app.use(methodOverride('X-HTTP-Method-Override'));

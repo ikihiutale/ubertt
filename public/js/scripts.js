@@ -17,7 +17,7 @@
       
     },   
     /**
-     * Sign up  validator
+     * Sign up validator on a browser side
      */
     signup_validate: function() {
       $('#uber_signup').validate({
@@ -29,6 +29,10 @@
             required: true
           }, 
           uber_surname: {
+            minlength: 2,
+            required: true
+          },  
+          uber_username: {
             minlength: 2,
             required: true
           },      
@@ -49,6 +53,7 @@
         messages: {
           uber_forename: "Please enter your forename",
           uber_surname: "Please enter your surname", 
+          uber_username: "Please enter your username", 
           uber_email: "Please enter a valid email address",
           uber_pwd1: {
               required: "Please provide a password",
@@ -68,7 +73,6 @@
           $(element).closest('.form-group').removeClass('has-error');
         },
         submitHandler: function(form) {
-          console.log("JEEEEEE");
           form.submit();
         }
       });

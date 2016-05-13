@@ -10,18 +10,26 @@
   <form id="uber_signup" role="form" action="/signup" method="post">
     {{!-- Cross-site request forgery (CSRF) --}}
     <input type="hidden" name="_csrf" value="{{_csrfToken}}"> 
+    
+    {{!-- Forename --}}
     <fieldset class="form-group">
       <label for="uber_forename">Forename:</label>
       <input type="text" class="form-control" id="uber_forename" name="uber_forename">
     </fieldset>
+    
+    {{!-- Surname --}}
     <fieldset class="form-group">
       <label for="uber_surname">Surname:</label>
       <input type="text" class="form-control" id="uber_surname" name="uber_surname">
     </fieldset>
+    
+    {{!-- Email --}}
     <fieldset class="form-group">
       <label for="uber_email">Email:</label>
       <input type="email" class="form-control" id="uber_email" name="uber_email">
     </fieldset>    
+
+    {{!-- Password --}}
     <fieldset class="form-group">
       <label for="uber_pwd1">Password:</label>
       <input type="password" class="form-control" id="uber_pwd1" name="uber_pwd1">
@@ -30,6 +38,7 @@
       <label for="uber_pwd2">Confirm Password:</label>
       <input type="password" class="form-control" id="uber_pwd2" name="uber_pwd2">
     </div>
+    
     <fieldset class="form-group">
       <div class="col-md-12 text-center"> 
         <button type="submit" class="btn btn-primary btn-lg" id="uber_submit_signup">

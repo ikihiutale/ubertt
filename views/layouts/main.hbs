@@ -15,24 +15,22 @@
   {{!-- ** FLASH MESSAGES ** --}}
 
   {{#if error}}
-    <div class="alert alert-warning alert-dismissible fade in" role="alert">
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&#x2717;</span>
-      </button>
+    <div class="alert alert-danger fade in out">
+      <a href="#" class="close" data-dismiss="alert">&#x2717;</a>
       <strong>{{wrapText error}}</strong>
     </div>
   {{/if}}
   {{#if notice}}
-    <div class="alert alert-warning" role="alert">
-      <a class="close" data-dismiss="warning">&#x2717;</a>  
+    <div class="alert alert-info fade in out">
+      <a href="#" class="close" data-dismiss="alert">&#x2717;</a>
       <strong>{{wrapText notice}}</strong>
     </div>
   {{/if}}
   {{#if success}}
-    <div class="alert alert-success" role="alert">  
-      <a class="close" data-dismiss="success">&#x2717;</a>  
-      <strong>{{wrapText success}}</strong>  
-    </div>  
+    <div class="alert alert-success fade in out">
+      <a href="#" class="close" data-dismiss="alert">&#x2717;</a>
+      <strong>{{wrapText success}}</strong> 
+    </div>
   {{/if}}
     {{!--
       {{log this}}

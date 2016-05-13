@@ -12,20 +12,19 @@ var SALT_VALUE = 10;
  * Define our user schema
  */
 var UserSchema = new mongoose.Schema({
-  forename: {
-    type: String,
-    unique: true,
-    required: true
-  },
-  surname: {
-    type: String,
-    unique: true,
-    required: true
+  name: {
+    first: {
+      type: String,
+      required: true
+    },
+    last: {
+      type: String,
+      required: true
+    },
   },
   password: {
     type: String,
     required: true
-    
   },
   email: {
     type: String,
@@ -60,7 +59,7 @@ UserSchema.path('email').validate(function(value, respond) {
     }
     respond(true);
   });
-}, 'The specified email address is already in use.');
+}, 'The specified email address is already in use');
 
 UserSchema.path('password').validate(function(password) {
   return password.length > 4;
@@ -95,20 +94,30 @@ UserSchema.pre('save', function(cb) {
  * User schema methods
  */
 UserSchema.methods.verifyPassword = function(password, cb) {
-  bcrypt.compare(password, this.password, function(err, isMatch) {
+  bcrypt.compare(password, this.password, function(err, match) {
     if (err) {
       return cb(err);
     }
-    cb(null, isMatch);
+    cb(null, match);
   });
 };
-
-bcrypt.hash("bacon", null, null, function(err, hash) {
-  // Store hash in your password DB.
-});
 
 UserSchema.methods.generateHash = function(password) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(SALT_VALUE), null);
 };
+
+/**
+ * User schema statics methods
+ */
+UserSchema.statics.findByEmail = function(email, cb) {
+  return this.find({ email: new RegExp(email, 'i') }, cb);
+}
+
+/**
+ * User schema virtual methods
+ */
+UserSchema.virtual('name.full').get(function () {
+  return this.name.first + ' ' + this.name.last;
+});
 
 module.exports = mongoose.model('User', UserSchema);

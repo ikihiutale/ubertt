@@ -28,10 +28,8 @@ var ValidationErrors = {
  * @api public
  */
 function create(req, res) {
-  logger.debug("+++ ctrl-user-crete");
   var user = new User({
-    forename: req.body.uber_forename,
-    surname: req.body.uber_surname,
+    name: {first: req.body.uber_forename, last: req.body.uber_surname},
     email: req.body.uber_email,
     password: req.body.uber_pwd1
   });
@@ -42,7 +40,8 @@ function create(req, res) {
       prettyJSON(err);
       // go through all the errors...
       for (var errName in err.errors) {
-        errMsg += errName + ": " + err.errors[errName].message + "\n";
+        errMsg += errName + ": " + err.errors[errName].message;
+        errMsg += " (" + err.errors[errName].value + ")\n";
         prettyJSON(err.errors[errName]);
         
         /*switch(err.errors[errName].type) {
@@ -70,19 +69,17 @@ function create(req, res) {
         }
       }
       */
-      errMsg += "FOO: BAR\n";
       
-      // return res.status(400).send(err);
       req.flash("error", errMsg);
       res.redirect('/signup')
     } 
     else {
       logger.debug("User created: " + user._id);
-      req.flash("info", "User created");
+      req.flash("success", "User created");
+      req.flash("notice", "jee jee\n\n\n");
       res.redirect('/');
     }
   });
-  logger.debug("--- ctrl-user-crete");
 }
 
 /**

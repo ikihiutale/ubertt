@@ -57,7 +57,7 @@ function localStrategy() {
 function init(app) {
   localStrategy();
   
-  //Configure Passport authenticated session persistence.
+  // Configure Passport authenticated session persistence.
   // In order to restore authentication state across HTTP requests, Passport needs
   // to serialize users into and deserialize users out of the session.  The
   // typical implementation of this is as simple as supplying the user ID when

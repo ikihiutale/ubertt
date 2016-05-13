@@ -10,14 +10,19 @@
   <form id="uber_login" role="form" action="/login" method="post">
     {{!-- Cross-site request forgery (CSRF) --}}
     <input type="hidden" name="_csrf" value="{{_csrfToken}}"> 
+    
+    {{!-- Email --}}
     <fieldset class="form-group">
       <label for="uber_email">Email:</label>
       <input type="email" class="form-control" id="uber_email" name="uber_email">
-    </fieldset>    
+    </fieldset>   
+    
+    {{!-- Password --}} 
     <fieldset class="form-group">
       <label for="uber_pwd1">Password:</label>
       <input type="password" class="form-control" id="uber_pwd1" name="uber_pwd1">
     </fieldset>
+    
     <fieldset class="checkbox">
       <label><input type="checkbox" id="uber_remember">Remember me</label>
     </fieldset>
