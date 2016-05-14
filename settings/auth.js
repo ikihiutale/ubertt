@@ -6,7 +6,7 @@
 var passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
     logger = require('./logger'),
-    User = require('../models/user');
+    User = require('../app/models/user');
 
 /**
  * Configure the local strategy for use by Passport.

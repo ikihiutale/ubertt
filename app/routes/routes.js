@@ -5,7 +5,7 @@
 
 var router = require('express').Router(),
     passport = require('passport'),
-    logger = require('./logger'),
+    logger = require('../../settings/logger'),
     ctlrs = require('../controllers');
 
 /**

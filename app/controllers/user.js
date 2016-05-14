@@ -6,7 +6,7 @@
 /**
  * Module dependencies.
  */
-var logger = require('../settings/logger'),
+var logger = require('../../settings/logger'),
     User   = require('../models/user');
 
 function prettyJSON(obj) {

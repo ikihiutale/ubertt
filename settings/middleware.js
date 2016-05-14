@@ -40,7 +40,7 @@ var cors = require('cors'),
     csurf = require('csurf'),
     passport = require('passport'),
     config = require('./config'),
-    routes = require('./routes'),
+    routes = require('../app/routes/routes'),
     auth = require('./auth'),
     logger = require('./logger');
 
@@ -115,6 +115,8 @@ function setSession(app) {
  * @private
  */
 function setViewEngine(app) {
+  app.set('views', path.join(__dirname, '../app/views')); 
+
   var hbs = exphbs.create({    
     defaultLayout: 'main',  
     handlebars: Handlebars,
@@ -130,7 +132,6 @@ function setViewEngine(app) {
       foo: function () { return 'FOO!'; },
       bar: function () { return 'BAR!'; }
     }});
-  app.set('views', path.join(__dirname, '../views')); 
   // The used file extension for Handlebars is .hbs. It could be
   // anything as long as the first parameter to the app.engine() 
   // function and the second parameter in the app.set('view engine') 
