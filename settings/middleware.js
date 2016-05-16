@@ -40,8 +40,7 @@ var cors = require('cors'),
     csurf = require('csurf'),
     passport = require('passport'),
     config = require('./config'),
-    routes = require('../app/routes/routes'),
-    auth = require('./auth'),
+    authentication = require('../app/controllers/authentication'),
     logger = require('./logger');
 
 /**
@@ -171,7 +170,7 @@ function setFlashMsg(app) {
  * @private
  */
 function setPassport(app) {
-  auth.init(app);
+  authentication.init(app);
 }
 
 /**
@@ -205,8 +204,28 @@ function setCSURF(app) {
  * @private
  */
 function setRoutes(app) {
-  routes.setRoutes(app, passport);
-  routes.setErrRoutes(app);
+  require('../app/routes/home')(app);
+  require('../app/routes/authentication')(app);
+  //Set error routes
+  app.use(function (err, req, res, next) {
+    // If the error object doesn't exists
+    if (!err) { return next(); }
+    // Log it
+    logger.error('Internal error (%d - url: %s): %s', 
+            res.statusCode, req.originalUrl, err.stack);
+    if (err.code === 'EBADCSRFTOKEN') {
+      // handle CSRF token errors here 
+      res.status(403).send('Bad CSRFT token - form tampered');
+    }
+    // Redirect to Internal Server Error
+    res.sendStatus(500);
+  });
+  // Assume 404 since no middleware responded
+  app.use(function (req, res) {
+    logger.error('Page not found error (url: %s)', req.originalUrl);
+    // Redirect to Page not Found
+    res.sendStatus(404);
+  });
 }
 
 /**

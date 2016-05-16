@@ -4,9 +4,8 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-    bcrypt = require('bcrypt-nodejs');
-
-var SALT_VALUE = 10;
+    bcrypt = require('bcrypt-nodejs'),
+    SALT_VALUE = 10;
 
 /**
  * Define our user schema
@@ -29,8 +28,8 @@ var UserSchema = new mongoose.Schema({
   email: {
     type: String,
     trim: true,
-    unique: true,
     required: true,
+    index: { unique: true },
     lowercase: true,
     match: [/.+\@.+\..+/, 'Please fill a valid email address']
   },
@@ -66,7 +65,9 @@ UserSchema.path('password').validate(function(password) {
 }, 'Your password must be at least 5 characters long');
 
 /**
- * User schema pre hooks
+ * User schema pre hooks..
+ * NOTE: Mongoose middleware is not invoked on update() operations, 
+ * so you must use a save()if you want to update user passwords
  */
 UserSchema.pre('save', function(cb) {
   var user = this;
@@ -74,7 +75,6 @@ UserSchema.pre('save', function(cb) {
   if (!user.isModified('password')) {
     return cb();
   }
-  
   // Password changed so it need to be hashed
   bcrypt.genSalt(SALT_VALUE, function(err, salt) {
     if (err) {
@@ -93,8 +93,8 @@ UserSchema.pre('save', function(cb) {
 /**
  * User schema methods
  */
-UserSchema.methods.verifyPassword = function(password, cb) {
-  bcrypt.compare(password, this.password, function(err, match) {
+UserSchema.methods.comparePassword = function(password, cb) {
+  bcrypt.compare(password.toLowerCase(), this.password, function(err, match) {
     if (err) {
       return cb(err);
     }
@@ -111,7 +111,27 @@ UserSchema.methods.generateHash = function(password) {
  */
 UserSchema.statics.findByEmail = function(email, cb) {
   return this.find({ email: new RegExp(email, 'i') }, cb);
-}
+};
+
+UserSchema.statics.isAuthenticated = function(email, password, cb) {
+  this.findOne({ email: email.toLowerCase() }, function(err, user) {
+    if (err) { return cb(err); }
+    // No user found with that email
+    if (!user) {
+      return cb(null, false, { error: 'The email is not found' });
+    }
+    // Make sure the password is correct
+    user.comparePassword(password, function(err, isMatch) {
+      if (err) { return cb(err); }
+      // Check if passwords didn't match
+      if (!isMatch) {
+        return cb(null, false, { error: 'The password is not correct.' });
+      }
+      // Success  
+      return cb(null, user);
+    });
+  });
+};
 
 /**
  * User schema virtual methods
