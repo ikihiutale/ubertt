@@ -113,23 +113,37 @@ UserSchema.statics.findByEmail = function(email, cb) {
   return this.find({ email: new RegExp(email, 'i') }, cb);
 };
 
-UserSchema.statics.isAuthenticated = function(email, password, cb) {
+/**
+ * Static method for checking if credentials match a user.
+ * @method authenticate
+ * @param {string} email Email
+ * @param {string} password Password
+ * @param {object} cb Callback function with two parameters, error, user 
+ * that are translated nicely to Passport in that order.
+ */
+UserSchema.statics.authenticate = function(email, password, cb) {
   this.findOne({ email: email.toLowerCase() }, function(err, user) {
-    if (err) { return cb(err); }
+    if (err) { return cb(err, null); }
     // No user found with that email
     if (!user) {
-      return cb(null, false, { error: 'The email is not found' });
+      // Email or password was invalid (no MongoDB error)
+      err = new Error("Missing credentials. Please try again.");
+      return cp(err, null);
+      // return cb(null, false, { error: 'The email is not found' });
     }
     // Make sure the password is correct
-    user.comparePassword(password, function(err, isMatch) {
-      if (err) { return cb(err); }
+    if (user.comparePassword(password, function(err, isMatch) {
+      if (err) { return cb(err, null); }
       // Check if passwords didn't match
       if (!isMatch) {
-        return cb(null, false, { error: 'The password is not correct.' });
+     // Email or password was invalid (no MongoDB error)
+        err = new Error("Missing credentials. Please try again.");
+        return cp(err, null);
+        // return cb(null, false, { error: 'The password is not correct.' });
       }
       // Success  
       return cb(null, user);
-    });
+    }));
   });
 };
 

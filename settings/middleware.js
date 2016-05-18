@@ -204,8 +204,10 @@ function setCSURF(app) {
  * @private
  */
 function setRoutes(app) {
+  // Set routes
   require('../app/routes/home')(app);
-  require('../app/routes/authentication')(app);
+  require('../app/routes/user')(app);
+  
   //Set error routes
   app.use(function (err, req, res, next) {
     // If the error object doesn't exists

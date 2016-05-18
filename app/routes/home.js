@@ -12,8 +12,6 @@ var router = require('express').Router(),
  */
 function setRoutes(app) {
   router.get('/', home.renderHome);
-  router.get('/login', home.renderLogin);
-  router.get('/signup', home.renderSignup);
   app.use(router);
 };
 
