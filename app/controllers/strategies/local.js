@@ -17,6 +17,7 @@ var passport = require('passport'),
  * @method localStrategy
  */
 function init() {
+  console.log("MITAAAA");
   passport.use(new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password',
@@ -26,6 +27,7 @@ function init() {
     logger.debug("ctrl-strategies-local email: " + email + ", passwd: " + password);
     User.authenticate(email, password, 
       function(err, user) {
+        console.log("ctrl-strategies-local email: " + email + ", passwd: " + password);
         // The message will be displayed on the next page the user visits.
         // No success messages for logging in currently.
         cb(err, user, err ? { error: err.message } : null);

@@ -11,7 +11,34 @@ var logger = require('../../settings/logger'),
 
 function prettyJSON(obj) {
   console.log(JSON.stringify(obj, null, 2));
-}
+};
+
+function getErrorMessage(err) {
+  var message = '';
+  if (err.code) {
+    switch (err.code) {
+      case 11000:
+      case 11001:
+        message = 'Username already exists';
+        break;
+      default:
+        message = 'Something went wrong';
+    }
+  }
+  else {
+    for (var errName in err.errors) {
+      if (err.errors[errName].message) {
+        message += errName + ": " + err.errors[errName].message;
+      }
+      if(err.errors[errName].value) {
+        message += " (" + err.errors[errName].value + ")";
+      }
+      message += "\n";
+    }
+  }
+  return message;
+};
+
 
 /**
  * Create user.
@@ -21,7 +48,7 @@ function prettyJSON(obj) {
  * @returns {object} the user corresponding to the specified id
  * @api public
  */
-function create(req, res) {
+function create(req, res, next) {
   var user = new User({
     name: {first: req.body.uber_forename, last: req.body.uber_surname},
     email: req.body.uber_email,
@@ -29,24 +56,14 @@ function create(req, res) {
   });
   user.save(function(err) {
     if (err) {
-      var errMsg = '';
-      logger.info("ctrl-user-create: " + prettyJSON(err));
-      // go through all the errors...
-      for (var errName in err.errors) {
-        errMsg += errName + ": " + err.errors[errName].message;
-        errMsg += " (" + err.errors[errName].value + ")\n";
-      }
-      logger.error("ctrl-user-create: " + errMsg);
-      req.flash("error", errMsg);
-      res.redirect('/signup')
-    } 
+      req.flash("error", err.message);
+      return next(err);
+    }
     else {
-      logger.debug("ctrl-user-create: id=" + user._id);
-      req.flash("success", "User created");
-      res.redirect('/');
+      res.json(user);
     }
   });
-}
+};
 
 /**
  * List of users.
@@ -87,6 +104,9 @@ function findById(req, res, id, next) {
   });
 };
 
+//========================================================
+// LOGIN
+//========================================================
 /**
  * Render a login page.
  * @param {object} req The request object
@@ -107,8 +127,19 @@ function renderLogin(req, res) {
   res.render('login', viewModel);
 } 
 
+//========================================================
+// LOGOUT
+//========================================================
+function logout(req, res) {
+  req.logout();
+  res.redirect('/');
+};
+
+//========================================================
+// SIGNUP
+//========================================================
 /**
- * Render a login page.
+ * Render a signup page.
  * @param {object} req The request object
  * @param {object} res The respond object
  * @api public
@@ -122,10 +153,47 @@ function renderSignup(req, res) {
   res.render('signup', viewModel);
 } 
 
+/**
+ * Signup
+ * @param {object} req The request object
+ * @param {object} res The respond object
+ * @api public
+ */
+function signup(req, res, next) {
+  if (!req.user) {
+    var user = new User({
+      name: {first: req.body.uber_forename, last: req.body.uber_surname},
+      email: req.body.uber_email,
+      password: req.body.uber_pwd1
+    });
+    user.save(function(err) {
+      if (err) {
+        var message = getErrorMessage(err);
+        req.flash('error', message);
+        return res.redirect('/signup');
+      } 
+
+      req.login(user, function(err) {
+        if (err) 
+          return next(err);
+        
+        return res.redirect('/');
+      });
+    });
+  }
+  else {
+    logger.debug("ctrl-user-signup - already logged id");
+    req.flash('notice', 'Already logged in');
+    return res.redirect('/');
+  }
+};
+
 module.exports = {
     create: create,
     findAll: findAll,
     findById: findById,
     renderLogin: renderLogin,
-    renderSignup: renderSignup
+    renderSignup: renderSignup,
+    signup: signup,
+    logout: logout
 };

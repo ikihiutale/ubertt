@@ -5,6 +5,7 @@
 
 var mongoose = require('mongoose'),
     bcrypt = require('bcrypt-nodejs'),
+    logger = require('../../settings/logger'),
     SALT_VALUE = 10;
 
 /**
@@ -122,6 +123,7 @@ UserSchema.statics.findByEmail = function(email, cb) {
  * that are translated nicely to Passport in that order.
  */
 UserSchema.statics.authenticate = function(email, password, cb) {
+  logger.debug("JEE ++"); 
   this.findOne({ email: email.toLowerCase() }, function(err, user) {
     if (err) { return cb(err, null); }
     // No user found with that email
