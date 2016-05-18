@@ -28,7 +28,7 @@ function init(app) {
 
   passport.deserializeUser(function(id, cb) {
     User.findById(id, function(err, user) {
-      logger.debug("ctrl-authenticate-deserializeUser: " + id);
+      logger.debug("ctrl-authenticate-deserializeUser: " + user.email);
       cb(err, user);
     });
   });

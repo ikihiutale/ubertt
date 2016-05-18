@@ -5,6 +5,7 @@
 
 var cors = require('cors'),
     path = require('path'),
+    util = require('util'),
     // Automated logging of request/response
     morgan = require('morgan'),
     helmet = require('helmet'),
@@ -40,7 +41,7 @@ var cors = require('cors'),
     csurf = require('csurf'),
     passport = require('passport'),
     config = require('./config'),
-    authentication = require('./passport'),
+    passport = require('./passport'),
     logger = require('./logger');
 
 /**
@@ -140,6 +141,21 @@ function setViewEngine(app) {
 }
 
 /**
+ * Set Passport
+ * 
+ * @method setFlashMsg
+ * @param {object} app The express application
+ * @private
+ */
+function setPassport(app) {
+  passport.init(app);
+}
+
+function prettyJSON(obj) {
+  console.log(JSON.stringify(obj, null, 2));
+};
+
+/**
  * Set flash messages
  * @method setFlashMsg
  * @param {object} app The express application
@@ -152,27 +168,23 @@ function setFlashMsg(app) {
   // Ensures that flash messages will be available to 
   // the template as locals.
   app.use(function(req, res, next){
+    
+    //logger.debug(util.inspect(req.session));
+    
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     res.locals.notice = req.flash('notice');
+    res.locals.authenticated = req.isAuthenticated();
     delete req.session.error;
     delete req.session.success;
     delete req.session.notice;
+
+    logger.debug(util.inspect(res.locals));
+
     next();
   });
 }
   
-/**
- * Set Passport
- * 
- * @method setFlashMsg
- * @param {object} app The express application
- * @private
- */
-function setPassport(app) {
-  authentication.init(app);
-}
-
 /**
  * Set Cross-site request forgery prevent module
  * @method setCSURF
@@ -258,12 +270,12 @@ function setMiddleware(app) {
   // app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
   setSession(app);
   setViewEngine(app);
-  setFlashMsg(app);
   // Persistent login sessions.
   // Note: the express.session() need to be 
   // before passport.session() to ensure that the 
   // login session is restored in the correct order
   setPassport(app);
+  setFlashMsg(app);
   setCSURF(app);
   setRoutes(app);
   if (config.environment === 'development') {   

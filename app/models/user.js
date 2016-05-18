@@ -123,25 +123,24 @@ UserSchema.statics.findByEmail = function(email, cb) {
  * that are translated nicely to Passport in that order.
  */
 UserSchema.statics.authenticate = function(email, password, cb) {
-  logger.debug("JEE ++"); 
   this.findOne({ email: email.toLowerCase() }, function(err, user) {
     if (err) { return cb(err, null); }
     // No user found with that email
     if (!user) {
       // Email or password was invalid (no MongoDB error)
-      err = new Error("Missing credentials. Please try again.");
-      return cp(err, null);
-      // return cb(null, false, { error: 'The email is not found' });
+      // err = new Error("Missing credentials. Please try again.");
+      // return cb(err, null);
+      return cb(null, false, { error: 'The email is not found' });
     }
     // Make sure the password is correct
     if (user.comparePassword(password, function(err, isMatch) {
       if (err) { return cb(err, null); }
       // Check if passwords didn't match
       if (!isMatch) {
-     // Email or password was invalid (no MongoDB error)
-        err = new Error("Missing credentials. Please try again.");
-        return cp(err, null);
-        // return cb(null, false, { error: 'The password is not correct.' });
+        // Email or password was invalid (no MongoDB error)
+        // err = new Error("Missing credentials. Please try again.");
+        // return cb(err, null);
+        return cb(null, false, { error: 'The password is not correct.' });
       }
       // Success  
       return cb(null, user);

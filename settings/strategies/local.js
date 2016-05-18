@@ -18,12 +18,10 @@ var passport = require('passport'),
  */
 function init() {
   passport.use(new LocalStrategy({
-    usernameField: 'email',
-    passwordField: 'password',
-    passReqToCallback : true
-  },
-  function(req, email, password, cb) {
-    logger.debug("ctrl-strategies-local email: " + email + ", passwd: " + password);
+    usernameField: 'uber_email',
+    passwordField: 'uber_pwd1',
+    passReqToCallback: true}, function(req, email, password, cb) {
+    logger.debug("ctrl-strategies-local email: " + email);
     User.authenticate(email, password, 
       function(err, user) {
         // The message will be displayed on the next page the user visits.

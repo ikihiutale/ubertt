@@ -17,10 +17,6 @@ function getErrorMessage(err) {
   var message = '';
   if (err.code) {
     switch (err.code) {
-      case 11000:
-      case 11001:
-        message = 'Username already exists';
-        break;
       default:
         message = 'Something went wrong';
     }
@@ -116,8 +112,7 @@ function findById(req, res, id, next) {
 function renderLogin(req, res) {
   var viewModel = {
       title: "UberTT",
-      pageTitle: "Login", 
-      user: null
+      pageTitle: "Login" 
   };
   // Render the view locally and sends the HTML as a response.
   // Note that Express has also another method for rendering views:
@@ -147,8 +142,7 @@ function logout(req, res) {
 function renderSignup(req, res) {
   var viewModel = {
       title: "UberTT",
-      pageTitle: "Signup", 
-      user: null
+      pageTitle: "Signup"
   };
   res.render('signup', viewModel);
 } 
@@ -160,7 +154,7 @@ function renderSignup(req, res) {
  * @api public
  */
 function signup(req, res, next) {
-  if (!req.user) {
+  if (!req.isAuthenticated()) {
     var user = new User({
       name: {first: req.body.uber_forename, last: req.body.uber_surname},
       email: req.body.uber_email,
@@ -172,11 +166,11 @@ function signup(req, res, next) {
         req.flash('error', message);
         return res.redirect('/signup');
       } 
-
+      // log the user in and serialize a session
       req.login(user, function(err) {
-        if (err) 
+        if (err) {
           return next(err);
-        
+        }
         return res.redirect('/');
       });
     });
