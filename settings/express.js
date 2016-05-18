@@ -40,7 +40,7 @@ var cors = require('cors'),
     csurf = require('csurf'),
     passport = require('passport'),
     config = require('./config'),
-    authentication = require('../app/controllers/authentication'),
+    authentication = require('./passport'),
     logger = require('./logger');
 
 /**

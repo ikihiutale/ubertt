@@ -5,8 +5,8 @@
 
 var passport = require('passport'),
     strategy = require('./strategies/local'),
-    logger = require('../../settings/logger'),
-    User = require('../models/user');
+    logger = require('./logger'),
+    User = require('../app/models/user');
 
 /**
  * Init authentication 

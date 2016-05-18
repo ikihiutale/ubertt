@@ -4,10 +4,10 @@ var colors  = require('colors'),
     settings = require('./settings'),
     pkg = require('./package.json');
 
-// Initialize db and start server
-settings.db(function startServer() {
+// Initialize mongoose and start server
+settings.mongoose(function startServer() {
   // Initialize express
-  var app = settings.middleware.init();
+  var app = settings.express.init();
   // Start up the server on the port specified in the config after we connected to mongodb
   app.listen(settings.config.server.port, function () {
     var serverBanner = ['',
